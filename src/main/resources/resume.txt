@@ -1,0 +1,71 @@
+
+Purshotam Yadav
+purshotam.yadav@gmail.com
+720-620-8940
+Dallas, Texas 75048
+
+
+Professional Summary
+
+Principal Engineer with 20+ years building scalable, high-availability, low-latency data platforms on AWS. Experienced in navigating complex incidents, scaling systems for 5x growth,
+ meeting 10s end-to-end SLAs, and improving reliability through architecture designs.
+
+Core Competencies
+
+Language:  Java 8/11/21, Python, JavaScript, TypeScript
+Cloud:  AWS, EKS ,Lambda,EventBridge, RDS, Secrets Manger, Step Functions, VPC Networking, Subnets, SNS, SQS, , EC2, CloudWatch, Route53
+Architecture:  Event-Driven Architecture, Event Sourcing, API Design
+Database/Storage:  Postgres, MySQL, DynamoDB, MongoDB,Cassandra
+Platform & Infra:  Kubernetes, Docker, Datadog, Kafka, Spark, Terraform, CICD, Helm
+Frameworks:  React ,FastAPI, OAuth2, Spring
+
+
+Fidelity investment |  Principal Engineer  |  Sep 2022 – Present
+
+Led end-to-end delivery of Trade Reporting and Compliance Engines (TRACE), owning architecture, development, production deployment, and operations, significantly reducing late trade reporting and compliance risk.
+Enhanced system scalability to support a greater number of MPIDs, efficiently processing daily trade volumes to 50 million.
+Architected and implemented distributed lock mechanism enabling fault-tolerant FIX message processing across multi-region pods, ensuring 100% adherence to 10-second regulatory reporting SLA.
+Led adoption of gRPC for internal service communication, replacing REST in critical paths to achieve lower latency, efficient serialization (Protobuf), and improved throughput in high-scale microservices architecture.
+Engineered and managed large-scale Kubernetes (Amazon EKS) clusters using the Operator pattern, automating application lifecycle (deployments, scaling, failover, upgrades) and reducing manual operational effort by ~60% while improving system reliability and consistency across services.
+Drove systemic reliability improvements across distributed, cloud-native services by influencing architecture, failure isolation patterns, and operational standards across multiple teams and regions.
+Engineered a Kafka Schema Registry automation platform supporting schema evolution, compatibility validation, and controlled QA→Prod promotion, alongside subject and security orchestration—cutting release friction by ~50%, reducing schema-related failures, and improving cross-team development velocity.
+Implemented a high-throughput, event-driven architecture using Apache Kafka, boosting system scalability to support a 3x increase in daily transactions/events.
+Built reusable infrastructure and deployment automation frameworks (Terraform, CI/CD) integrate with Jenkins adopted by 8 teams, reducing manual work, and enabling teams to safely provision and operate production services in hours instead of days.
+Designed and rolled out a comprehensive observability platform (metrics, logs, alerts) to proactively detect reliability risks, reducing MTTD from 18 minutes to 7 minutes.
+Redesigned alerting strategy with SLO-based thresholds and alert correlation, reducing alert noise and enabling faster, more actionable incident response across distributed systems.
+Effectively build data model and performance tuning for Postgres reducing query time from 800ms to 640ms (20%).
+Established automated testing patterns across microservices (unit, integration, contract, and end-to-end), improving release confidence and reducing production defects in high-scale distributed systems.
+Eliminated certificate-related outages by automating end-to-end certificate lifecycle using Venafi and Kubernetes cert-manager, enabling secure Kafka service integrations, zero-downtime certificate rotation, and consistent secret management across distributed microservices.
+
+Built tool to securely manage and distribute digital secrets/certificate, ClientID, secrets enforcing standardized access controls and reducing operational risk across teams
+
+SirusXM | Senior Software Engineer | Mar 2022- Aug 2022
+
+Led design and development of a next-generation connected vehicle platform supporting multiple OEM programs (Honda, FCA), delivering scalable, modular services for 8M+ vehicles and driving platform evolution across teams
+Reduced annual AWS overhead by $180K by engineering tiered S3 lifecycle policies and optimizing data pipeline compute efficiency.
+Instrumented Java Spring Boot Java REST API services with Datadog traces, logs, and metrics, improving production visibility and accelerating issue resolution.
+Drove PostgreSQL query performance from sluggish to sub-second — profiling slow queries, restructuring execution plans for large datasets, tuning connection pooling and DB parameters to eliminate bottlenecks.
+Built Terraform modules that encode our architecture standards—naming conventions, security defaults, scaling patterns—so teams get best practices by default.
+Built AWS S3 data lake for marketing analytics that drove 10% revenue uplift from trial-to-paid conversions
+
+Nike | Senior Software Engineer | Jan 2015 – Mar 2020
+Built the Nike+ Fuel Band leaderboard with REST API and Kafka + PySpark with 500M transactions/day
+Used Bloom filters data structure to cut storage usage by 50%.
+Improved service response times to sub-second latency through performance engineering using Datadog APM, trace analysis, and bottleneck remediation.
+Improved resilience 30% with circuit breaker patterns to prevent cascading failures.
+Implemented Terraform and Helm to treat our entire Kubernetes setup like code—clean, predictable, and easily scaled to 10+ nodes.
+Deployed Datadog APM and tracing across 10+ microservices, streamlining root-cause analysis and significantly improving response times for production outages.
+
+
+Nagarro | Technical Lead | Jan 2013 – Dec 2014
+Led team to implement MyZenKey Identity provider, built on Auth2/ OpenID connect, used for apps and web application to authentication and authorization
+
+
+Interglobe Technologies  | Software engineer | May 2009 – Oct 2012
+Designed and implemented corporate travel booking tool used object pool, caching, database partition, reduced loading time from 5s to 1.5s
+Built asynchronous APIs for airline ticket comparison, reducing response wait times and improving fare aggregation across providers.
+
+HSBC/TCS | Software Engineer| Oct 2004 – May 2009
+
+Contributed to HSBC’s online banking platform, designing, and implementing core Account Management modules in a high-availability, security-critical environment
+Consistent focus on performance — tracked down Java JVM GC issues, memory leaks, connection pool bottlenecks. Refactored legacy codebases for maintainability

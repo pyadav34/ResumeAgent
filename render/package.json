@@ -1,0 +1,13 @@
+{
+  "name": "resume-render",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Node.js docx renderer for ResumeAgent",
+  "main": "render.js",
+  "scripts": {
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "docx": "^8.5.0"
+  }
+}
