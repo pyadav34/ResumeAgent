@@ -1,6 +1,6 @@
 # ResumeAgent
 
-A command line based tool that tailors a resume to a specific job description using an LLM-driven pipeline, then renders it to `.docx` and `.pdf`.
+A command line based AI agent that tailors a resume to a specific job description using an LLM-driven pipeline, then renders it to `.docx` and `.pdf`.
 
 Instead of one big "rewrite my resume" prompt, the JD and resume are pushed through five focused, single-purpose LLM calls — each with a narrow job and strict rules against inventing skills, metrics, or claims not already present in the source resume.
 
