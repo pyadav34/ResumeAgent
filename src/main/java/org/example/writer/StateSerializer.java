@@ -38,6 +38,7 @@ public class StateSerializer {
         contact.put("phone",    c.phone()    != null ? c.phone()    : "");
         contact.put("address1", c.address1() != null ? c.address1() : "");
         root.set("contact", contact);
+        root.put("skillsPosition", tailored.competenciesAtEnd() ? "end" : "start");
 
         ArrayNode linesArr    = mapper.createArrayNode();
         ArrayNode sectionsArr = mapper.createArrayNode();
@@ -45,32 +46,34 @@ public class StateSerializer {
         ObjectNode resumeSections = mapper.createObjectNode();
         ObjectNode sectionMeta    = mapper.createObjectNode();
 
-        // Summary section — use LLM-tailored summary
-        String sumSecId = "sec-summary";
-        sectionsArr.add(section(sumSecId, "summary", "Professional Summary"));
-        ArrayNode sumLineIds = mapper.createArrayNode();
+        // Summary section — only if resume.txt actually had one
         String summaryText = (tailored.tailoredSummary() != null && !tailored.tailoredSummary().isBlank())
                 ? tailored.tailoredSummary()
                 : resume.summary();
         if (summaryText != null && !summaryText.isBlank()) {
+            String sumSecId = "sec-summary";
+            sectionsArr.add(section(sumSecId, "summary", "Professional Summary"));
+            ArrayNode sumLineIds = mapper.createArrayNode();
             String lineId = "line-summary-0";
             linesArr.add(line(lineId, summaryText, null));
             sumLineIds.add(lineId);
+            resumeSections.set(sumSecId, sumLineIds);
         }
-        resumeSections.set(sumSecId, sumLineIds);
 
-        // Skills section
-        String skillSecId = "sec-skills";
-        sectionsArr.add(section(skillSecId, "skills", "Core Competencies"));
-        ArrayNode skillLineIds = mapper.createArrayNode();
+        // Skills section — only if resume.txt actually had competencies
         List<CompetencyCategory> cats = tailored.orderedCategories();
-        for (int i = 0; i < cats.size(); i++) {
-            CompetencyCategory cat = cats.get(i);
-            String lineId = "skill-" + i;
-            linesArr.add(skillLine(lineId, cat.skills(), cat.category()));
-            skillLineIds.add(lineId);
+        if (!cats.isEmpty()) {
+            String skillSecId = "sec-skills";
+            sectionsArr.add(section(skillSecId, "skills", "Core Competencies"));
+            ArrayNode skillLineIds = mapper.createArrayNode();
+            for (int i = 0; i < cats.size(); i++) {
+                CompetencyCategory cat = cats.get(i);
+                String lineId = "skill-" + i;
+                linesArr.add(skillLine(lineId, cat.skills(), cat.category()));
+                skillLineIds.add(lineId);
+            }
+            resumeSections.set(skillSecId, skillLineIds);
         }
-        resumeSections.set(skillSecId, skillLineIds);
 
         // Employment sections
         for (TailoredEntry entry : tailored.entries()) {
@@ -91,7 +94,7 @@ public class StateSerializer {
             meta.put("title",        entry.title()     != null ? entry.title()     : "");
             meta.put("startDate",    entry.startDate() != null ? entry.startDate() : "");
             meta.put("endDate",      entry.endDate()   != null ? entry.endDate()   : "");
-            meta.put("technologies", "");
+            meta.put("technologies", entry.technologies() != null ? entry.technologies() : "");
             meta.put("project",      "");
             sectionMeta.set(secId, meta);
         }

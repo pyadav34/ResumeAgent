@@ -2,7 +2,9 @@ package org.example;
 
 import org.example.agent.ResumeAgent;
 import org.example.config.AppConfig;
+import org.example.model.EmploymentEntry;
 import org.example.model.Resume;
+import org.example.model.TailoredEntry;
 import org.example.model.TailoredResume;
 import org.example.parser.ResumeParser;
 import org.example.writer.PdfConverter;
@@ -11,6 +13,7 @@ import org.example.writer.StateSerializer;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class Main {
 
@@ -38,6 +41,7 @@ public class Main {
         Files.createDirectories(outputDir);
         Path docxPath = outputDir.resolve("purshotam_yadav.docx");
         Path pdfPath  = outputDir.resolve("purshotam_yadav.pdf");
+        Files.copy(jdFile, outputDir.resolve("jd.txt"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
         System.out.println("=== Resume Tailoring Agent ===");
         System.out.println("JD       : " + jdPath);
@@ -55,9 +59,15 @@ public class Main {
         System.out.println("Resume   : " + resume.employments().size()
                 + " employers, " + resume.competencies().size() + " skill categories");
 
-        // Run LLM pipeline
-        ResumeAgent agent = new ResumeAgent();
-        TailoredResume tailored = agent.tailor(resume, jdText);
+        // Run LLM pipeline (or skip it entirely and render resume.txt as-is)
+        TailoredResume tailored;
+        if (AppConfig.IGNORE_LLMS) {
+            System.out.println("[ignore-llms] Skipping LLM tailoring — building resume as-is.");
+            tailored = buildDirect(resume);
+        } else {
+            ResumeAgent agent = new ResumeAgent();
+            tailored = agent.tailor(resume, jdText);
+        }
 
         // Write .docx
         StateSerializer serializer = new StateSerializer();
@@ -69,5 +79,16 @@ public class Main {
         System.out.println("=== Done ===");
         System.out.println("DOCX: " + docxPath);
         System.out.println("PDF : " + pdfPath);
+    }
+
+    private static TailoredResume buildDirect(Resume resume) {
+        List<TailoredEntry> entries = resume.employments().stream()
+                .map(Main::toTailoredEntry)
+                .toList();
+        return new TailoredResume(resume.summary(), resume.competencies(), entries, resume.competenciesAtEnd());
+    }
+
+    private static TailoredEntry toTailoredEntry(EmploymentEntry e) {
+        return new TailoredEntry(e.companyName(), e.title(), e.startDate(), e.endDate(), e.bullets(), e.technologies());
     }
 }

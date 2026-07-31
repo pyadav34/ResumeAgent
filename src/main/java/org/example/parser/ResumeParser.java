@@ -18,8 +18,13 @@ public class ResumeParser {
     public Resume parse(String text) {
         List<String> lines = text.lines().toList();
 
-        enum State { CONTACT, SUMMARY, COMPETENCIES, EMPLOYER }
-        State state = State.CONTACT;
+        // Sections are optional and may appear in any order relative to one another
+        // (e.g. "Core Competencies" may come before the first employer or after the last one).
+        // Each marker line is recognized regardless of the current section, so a missing
+        // "Professional Summary" / "Core Competencies" header doesn't strand later lines
+        // (like employer entries) in the wrong section.
+        enum Section { CONTACT, SUMMARY, COMPETENCIES, EMPLOYER }
+        Section section = Section.CONTACT;
 
         List<String> contactLines = new ArrayList<>();
         StringBuilder summaryBuilder = new StringBuilder();
@@ -27,54 +32,71 @@ public class ResumeParser {
         List<EmploymentEntry> employments = new ArrayList<>();
 
         String currentCompany = null, currentTitle = null, currentStart = null, currentEnd = null;
+        String currentTechnologies = null;
         List<String> currentBullets = new ArrayList<>();
+
+        // Whether "Core Competencies" was declared after at least one employer has already
+        // been seen — output should mirror that position (start vs. end of the resume).
+        boolean competenciesAtEnd = false;
 
         for (String raw : lines) {
             String trimmed = raw.trim();
 
-            switch (state) {
-                case CONTACT -> {
-                    if (trimmed.equals("Professional Summary")) {
-                        state = State.SUMMARY;
-                    } else {
-                        contactLines.add(trimmed);
-                    }
+            if (trimmed.equals("Professional Summary")) {
+                if (currentCompany != null) {
+                    employments.add(new EmploymentEntry(
+                            currentCompany, currentTitle, currentStart, currentEnd,
+                            List.copyOf(currentBullets), currentTechnologies));
+                    currentCompany = null;
                 }
+                section = Section.SUMMARY;
+                continue;
+            }
+            if (trimmed.equals("Core Competencies")) {
+                if (currentCompany != null) {
+                    employments.add(new EmploymentEntry(
+                            currentCompany, currentTitle, currentStart, currentEnd,
+                            List.copyOf(currentBullets), currentTechnologies));
+                    currentCompany = null;
+                }
+                competenciesAtEnd = !employments.isEmpty();
+                section = Section.COMPETENCIES;
+                continue;
+            }
+            if (isEmployerHeader(trimmed)) {
+                if (currentCompany != null) {
+                    employments.add(new EmploymentEntry(
+                            currentCompany, currentTitle, currentStart, currentEnd,
+                            List.copyOf(currentBullets), currentTechnologies));
+                }
+                String[] parts = splitEmployer(trimmed);
+                currentCompany = parts[0];
+                currentTitle   = parts[1];
+                currentStart   = parts[2];
+                currentEnd     = parts[3];
+                currentBullets = new ArrayList<>();
+                currentTechnologies = null;
+                section = Section.EMPLOYER;
+                continue;
+            }
+
+            switch (section) {
+                case CONTACT -> contactLines.add(trimmed);
                 case SUMMARY -> {
-                    if (trimmed.equals("Core Competencies")) {
-                        state = State.COMPETENCIES;
-                    } else if (!trimmed.isEmpty()) {
+                    if (!trimmed.isEmpty()) {
                         if (!summaryBuilder.isEmpty()) summaryBuilder.append(" ");
                         summaryBuilder.append(trimmed);
                     }
                 }
                 case COMPETENCIES -> {
-                    if (isEmployerHeader(trimmed)) {
-                        state = State.EMPLOYER;
-                        String[] parts = splitEmployer(trimmed);
-                        currentCompany = parts[0];
-                        currentTitle   = parts[1];
-                        currentStart   = parts[2];
-                        currentEnd     = parts[3];
-                        currentBullets = new ArrayList<>();
-                    } else if (trimmed.matches("[A-Za-z /&]+:\\s+.+")) {
+                    if (trimmed.matches("[A-Za-z /&]+:\\s+.+")) {
                         String[] kv = trimmed.split(":\\s+", 2);
                         competencies.add(new CompetencyCategory(kv[0].trim(), kv[1].trim()));
                     }
                 }
                 case EMPLOYER -> {
-                    if (isEmployerHeader(trimmed)) {
-                        if (currentCompany != null) {
-                            employments.add(new EmploymentEntry(
-                                    currentCompany, currentTitle, currentStart, currentEnd,
-                                    List.copyOf(currentBullets)));
-                        }
-                        String[] parts = splitEmployer(trimmed);
-                        currentCompany = parts[0];
-                        currentTitle   = parts[1];
-                        currentStart   = parts[2];
-                        currentEnd     = parts[3];
-                        currentBullets = new ArrayList<>();
+                    if (isTechStackLine(trimmed)) {
+                        currentTechnologies = trimmed.split(":\\s*", 2)[1].trim();
                     } else if (!trimmed.isEmpty()) {
                         currentBullets.add(trimmed);
                     }
@@ -85,13 +107,20 @@ public class ResumeParser {
         if (currentCompany != null && !currentBullets.isEmpty()) {
             employments.add(new EmploymentEntry(
                     currentCompany, currentTitle, currentStart, currentEnd,
-                    List.copyOf(currentBullets)));
+                    List.copyOf(currentBullets), currentTechnologies));
         }
 
         Contact contact = parseContact(contactLines);
         String summary = summaryBuilder.toString().trim();
 
-        return new Resume(contact, summary, List.copyOf(competencies), List.copyOf(employments));
+        return new Resume(contact, summary, List.copyOf(competencies), List.copyOf(employments), competenciesAtEnd);
+    }
+
+    // A trailing "Development Environment: ..." / "Technologies: ..." line lists the tech
+    // stack for the job rather than an accomplishment — it's kept verbatim and rendered
+    // separately instead of being scored/selected as a bullet.
+    private boolean isTechStackLine(String line) {
+        return line.matches("(?i)(development environment|technologies|tech stack|environment)\\s*:.+");
     }
 
     private boolean isEmployerHeader(String line) {

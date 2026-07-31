@@ -705,7 +705,7 @@ const opts = {
   includeSummary: true,
   includeSkills: true,
   skillsLayout: "categorized",
-  skillsPosition: "start",
+  skillsPosition: state.skillsPosition || "start",
 };
 
 const doc = buildDoc(state, opts);

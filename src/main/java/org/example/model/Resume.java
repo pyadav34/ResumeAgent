@@ -6,5 +6,6 @@ public record Resume(
         Contact contact,
         String summary,
         List<CompetencyCategory> competencies,
-        List<EmploymentEntry> employments
+        List<EmploymentEntry> employments,
+        boolean competenciesAtEnd
 ) {}

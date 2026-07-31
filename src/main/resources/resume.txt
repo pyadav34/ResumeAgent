@@ -1,0 +1,49 @@
+
+Purshotam Yadav
+purshotam.yadav@gmail.com
+720-620-8940
+Dallas, Texas 75048
+
+
+Fidelity investment |  Principal Engineer  |  Sep 2022 – Present
+Owned the architecture, development, and production operations of a real-time trade reporting system, cutting compliance risk and reporting delays.
+Scaled the platform to handle 50 million+ transactions a day while adding support for many more client accounts.
+Implemented Go based scalable microservice, supporting high-volume transactions with low latency and high availability.
+Designed a distributed locking mechanism using Redis so message processing stayed fault-tolerant across multi-region Kubernetes pods, hitting a strict 10-second SLA 100% of the time.
+Drove reliability improvements across multiple distributed, cloud-native services by shaping architecture and failure-isolation patterns used by other teams.
+Led the move to gRPC for internal service-to-service communication, replacing REST in key paths for lower latency and better throughput at scale.
+Built an event-driven pipeline on Apache Kafka that scaled the system to handle 3x more daily transactions.
+Built a Kafka Schema Registry automation platform for schema evolution and safe QA-to-Prod promotion, cutting release friction by about 50%.
+Tuned Postgres data models and queries to reliably support 5,000+ per second transactions during peak load.
+Built Terraform and CI/CD automation adopted by 8 teams, cutting service provisioning time from days to hours.
+Built an observability platform (metrics, logs, alerts) that cut mean time to detect issues from 18 minutes to 7.
+Managed large-scale Kubernetes (EKS) clusters using the Operator pattern, automating deployments and scaling and cutting manual ops work by ~60%.
+Acted as a technical resource across teams — code reviews, mentoring, and driving best practices across a large distributed systems footprint.
+
+SirusXM | Senior Software Engineer | Mar 2022- Aug 2022
+Led the design and development of a connected vehicle platform used across multiple OEM (Honda, FCA), building scalable backend services that supported 8M+ vehicles and shaped the platform's overall architecture.
+Built an AWS S3 data lake with product and business teams for marketing analytics, which helped drive a 10% increase in trial-to-paid conversions.
+Cut AWS costs by $180K a year through smarter S3 storage tiering and optimizing pipeline compute, without affecting customer SLAs.
+Wrote Terraform modules that baked in architecture standards — naming, security defaults, scaling patterns — so every team provisioned infrastructure consistently by default.
+Built versioned Go based REST APIs with OpenAPI/Swagger to connect frontend, backend, and third-party systems while keeping backward compatibility.
+Designed and optimized DynamoDB data models based on application access patterns, improving query performance, scalability, and cost efficiency.
+Designed and built mutual TLS (mTLS) authentication between connected vehicles and the HiveMQ MQTT broker for secure, certificate-based device communication.
+
+Nike | Senior Software Engineer | Jan 2015 – Mar 2020
+Built the Nike+ Fuel Band leaderboard with microservice and Kafka + Spark with 500M transactions/day
+Improved REST API reliability by implementing retry mechanisms, circuit breakers, rate limiting, and request validation for fault-tolerant service communication.
+Used Bloom filters data structure to cut storage usage by 50%.
+Improved service response times to sub-second latency through performance engineering using Datadog APM, trace analysis, and bottleneck remediation.
+Improved resilience 30% with circuit breaker patterns to prevent cascading failures.
+Optimized DynamoDB partition and sort key design to support high-throughput, low-latency data access.
+Designed and optimized DynamoDB data models based on application access patterns, improving query performance, scalability, and cost efficiency.
+
+
+Core Competencies
+
+Language:  Go,TypeScript,JavaScript, Java 8/11/21, Python
+Cloud:  AWS, EKS ,ECS, Aurora, Athena, S3, SQS,Lambda,EventBridge,RDS, Secrets Manger,VPC ,SNS, SQS, EC2, CloudWatch, Route53
+Architecture:  Event-Driven Architecture, Event Sourcing, API Design
+Database/Storage:  Postgres, Redis, MySQL, DynamoDB, MongoDB,Cassandra
+Platform & Infra:  Kubernetes, Docker, Datadog, Kafka, Spark, Terraform, CICD, Helm
+Frameworks:  React ,React Router, FastAPI, OAuth2, Spring, Opensearch

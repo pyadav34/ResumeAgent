@@ -35,6 +35,11 @@ public class AppConfig {
     public static final String OLLAMA_BASE_URL = System.getProperty("ollama.url", "http://localhost:11434");
 
     // ── Pipeline settings ────────────────────────────────────────────────────
+    // When true, skip the LLM tailoring pipeline entirely and render resume.txt as-is.
+    // Override at runtime with -Dignore.llms=true
+    public static final boolean IGNORE_LLMS = Boolean.parseBoolean(
+            System.getProperty("ignore.llms", "true")
+    );
     public static final String JD_PATH         = "jd.txt";
     public static final String OUTPUT_BASE_DIR = System.getProperty("user.home") + "/clauderesume";
     public static final String RENDER_SCRIPT   = "render/render.js";

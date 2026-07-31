@@ -5,5 +5,6 @@ import java.util.List;
 public record TailoredResume(
         String tailoredSummary,
         List<CompetencyCategory> orderedCategories,
-        List<TailoredEntry> entries
+        List<TailoredEntry> entries,
+        boolean competenciesAtEnd
 ) {}

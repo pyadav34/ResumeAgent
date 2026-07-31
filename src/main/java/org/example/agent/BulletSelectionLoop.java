@@ -152,7 +152,7 @@ public class BulletSelectionLoop {
     }
 
     private TailoredEntry tailored(EmploymentEntry e, List<String> bullets) {
-        return new TailoredEntry(e.companyName(), e.title(), e.startDate(), e.endDate(), bullets);
+        return new TailoredEntry(e.companyName(), e.title(), e.startDate(), e.endDate(), bullets, e.technologies());
     }
 
     private List<BulletScore> scoreBullets(String company, List<String> bullets,

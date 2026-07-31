@@ -7,5 +7,6 @@ public record EmploymentEntry(
         String title,
         String startDate,
         String endDate,
-        List<String> bullets
+        List<String> bullets,
+        String technologies
 ) {}

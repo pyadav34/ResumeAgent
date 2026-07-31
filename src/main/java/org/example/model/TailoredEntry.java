@@ -7,5 +7,6 @@ public record TailoredEntry(
         String title,
         String startDate,
         String endDate,
-        List<String> selectedBullets
+        List<String> selectedBullets,
+        String technologies
 ) {}

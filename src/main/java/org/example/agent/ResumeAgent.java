@@ -30,12 +30,23 @@ public class ResumeAgent {
                 + requirements.stream().filter(r -> r.priority() == JobRequirement.Priority.HIGH).count()
                 + " HIGH)");
 
-        System.out.println("\n[2] Tailoring professional summary...");
-        String tailoredSummary = summaryTailor.tailor(resume.summary(), requirements);
+        String tailoredSummary;
+        if (resume.summary() == null || resume.summary().isBlank()) {
+            System.out.println("\n[2] No professional summary in resume — skipping.");
+            tailoredSummary = "";
+        } else {
+            System.out.println("\n[2] Tailoring professional summary...");
+            tailoredSummary = summaryTailor.tailor(resume.summary(), requirements);
+        }
 
-        System.out.println("\n[3] Reordering core competencies...");
-        List<CompetencyCategory> orderedCategories =
-                reorderer.reorderAndFilter(requirements, resume.competencies());
+        List<CompetencyCategory> orderedCategories;
+        if (resume.competencies().isEmpty()) {
+            System.out.println("\n[3] No core competencies in resume — skipping.");
+            orderedCategories = List.of();
+        } else {
+            System.out.println("\n[3] Reordering core competencies...");
+            orderedCategories = reorderer.reorderAndFilter(requirements, resume.competencies());
+        }
 
         System.out.println("\n[4] Selecting bullets per employer...");
         List<TailoredEntry> entries = new ArrayList<>();
@@ -47,6 +58,6 @@ public class ResumeAgent {
             entries.add(tailored);
         }
 
-        return new TailoredResume(tailoredSummary, orderedCategories, entries);
+        return new TailoredResume(tailoredSummary, orderedCategories, entries, resume.competenciesAtEnd());
     }
 }
