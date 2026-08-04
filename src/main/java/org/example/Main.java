@@ -66,7 +66,12 @@ public class Main {
             tailored = buildDirect(resume);
         } else {
             ResumeAgent agent = new ResumeAgent();
-            tailored = agent.tailor(resume, jdText);
+            ResumeAgent.TailoringResult result = agent.tailor(resume, jdText);
+            tailored = result.resume();
+
+            Path coveragePath = outputDir.resolve("requirement_coverage.txt");
+            Files.writeString(coveragePath, result.coverageReport());
+            System.out.println("Coverage : " + coveragePath);
         }
 
         // Write .docx

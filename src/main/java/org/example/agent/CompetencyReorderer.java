@@ -1,96 +1,98 @@
 package org.example.agent;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.example.llm.LlmClient;
-import org.example.llm.JsonUtil;
 import org.example.model.CompetencyCategory;
 import org.example.model.JobRequirement;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class CompetencyReorderer {
 
-    private final LlmClient claude;
-
-    public CompetencyReorderer(LlmClient claude) {
-        this.claude = claude;
-    }
-
+    // No LLM call: category and skill relevance is decided by keyword-matching against the
+    // requirement text, which is already how promotePrioritySkills' predecessor overrode the
+    // LLM's own within-category ordering. extractRequirements only ever emits requirement text
+    // using terms explicitly named in the JD, so literal keyword matching is a safe substitute.
     public List<CompetencyCategory> reorderAndFilter(List<JobRequirement> requirements,
                                                       List<CompetencyCategory> current) {
-        String raw = claude.call(PromptTemplates.SYSTEM_JSON,
-                                 PromptTemplates.reorderAndFilterCompetencies(requirements, current));
-        String json = JsonUtil.stripFences(raw);
-        System.out.println("\n  ┌─ LLM #2 reorder competencies");
-        for (String line : json.lines().toList()) System.out.println("  │ " + line);
-        System.out.println("  └─────");
+        List<String> highKeywords = keywordsFor(requirements, JobRequirement.Priority.HIGH);
+        List<String> medKeywords  = keywordsFor(requirements, JobRequirement.Priority.MED);
 
-        try {
-            List<Map<String, String>> items = JsonUtil.parse(json, new TypeReference<>() {});
-            List<CompetencyCategory> llmResult = items.stream()
-                    .map(m -> new CompetencyCategory(
-                            m.getOrDefault("category", ""),
-                            m.getOrDefault("skills", "")))
-                    .filter(c -> !c.category().isEmpty() && !c.skills().isBlank())
-                    .toList();
+        // Stream.sorted() is a stable sort, so categories with equal relevance keep their
+        // original relative order instead of being shuffled.
+        List<CompetencyCategory> reordered = current.stream()
+                .sorted(Comparator.comparingInt(
+                        (CompetencyCategory c) -> -matchScore(c, highKeywords, medKeywords)))
+                .map(c -> promotePrioritySkills(c, highKeywords, medKeywords))
+                .toList();
 
-            if (llmResult.isEmpty()) {
-                System.err.println("[warn] Competency reorder returned empty; using original");
-                return current;
-            }
-
-            // Enforce HIGH-priority skills appear first within their category
-            List<CompetencyCategory> enforced = llmResult.stream()
-                    .map(cat -> promoteHighPrioritySkills(cat, requirements))
-                    .collect(Collectors.toList());
-
-            System.out.println("  Final order:");
-            for (CompetencyCategory c : enforced) {
-                System.out.println("    " + c.category() + ": " + c.skills());
-            }
-            return enforced;
-
-        } catch (Exception e) {
-            System.err.println("[warn] Competency reorder parse error: " + e.getMessage() + "; using original");
-            return current;
+        System.out.println("\n  Competency order (local, no LLM):");
+        for (CompetencyCategory c : reordered) {
+            System.out.println("    " + c.category() + ": " + c.skills());
         }
+        return reordered;
+    }
+
+    private List<String> keywordsFor(List<JobRequirement> requirements, JobRequirement.Priority priority) {
+        return requirements.stream()
+                .filter(r -> r.priority() == priority)
+                .map(r -> r.description().toLowerCase())
+                .toList();
+    }
+
+    // HIGH matches are weighted far above MED matches, so any category with HIGH-priority
+    // relevance ranks above one with only MED-priority relevance, regardless of match count.
+    private int matchScore(CompetencyCategory cat, List<String> highKeywords, List<String> medKeywords) {
+        List<String> skills = splitSkills(cat.skills());
+        long highMatches = skills.stream().filter(s -> matchesAny(s, highKeywords)).count();
+        long medMatches  = skills.stream().filter(s -> matchesAny(s, medKeywords)).count();
+        return (int) (highMatches * 1000 + medMatches);
     }
 
     /**
-     * Ensures any skill keyword that appears in a HIGH requirement is moved to the
-     * front of the comma-separated skills string for that category.
+     * Promotes skills matching a HIGH requirement to the front of the category, then skills
+     * matching a MED requirement, leaving the rest in their original relative order.
      */
-    private CompetencyCategory promoteHighPrioritySkills(CompetencyCategory cat,
-                                                          List<JobRequirement> requirements) {
-        List<String> highKeywords = requirements.stream()
-                .filter(r -> r.priority() == JobRequirement.Priority.HIGH)
-                .map(r -> r.description().toLowerCase())
-                .toList();
+    private CompetencyCategory promotePrioritySkills(CompetencyCategory cat,
+                                                      List<String> highKeywords, List<String> medKeywords) {
+        List<String> skills = splitSkills(cat.skills());
 
-        List<String> skills = Arrays.stream(cat.skills().split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        // Score each skill: how many HIGH requirement keywords does it match?
-        List<String> promoted = new ArrayList<>();
-        List<String> rest     = new ArrayList<>();
-
+        List<String> high = new ArrayList<>();
+        List<String> med  = new ArrayList<>();
+        List<String> rest = new ArrayList<>();
         for (String skill : skills) {
-            String lower = skill.toLowerCase();
-            boolean isHigh = highKeywords.stream()
-                    .anyMatch(kw -> kw.contains(lower) || lower.contains(
-                            // extract the core word from the skill (e.g. "Java 8/11/14" → "java")
-                            lower.split("[ /]")[0]));
-            if (isHigh) promoted.add(skill);
-            else        rest.add(skill);
+            if (matchesAny(skill, highKeywords))     high.add(skill);
+            else if (matchesAny(skill, medKeywords)) med.add(skill);
+            else                                     rest.add(skill);
         }
 
-        if (promoted.isEmpty()) return cat; // nothing to change
+        if (high.isEmpty() && med.isEmpty()) return cat; // nothing to change
 
-        List<String> ordered = new ArrayList<>(promoted);
+        List<String> ordered = new ArrayList<>(high);
+        ordered.addAll(med);
         ordered.addAll(rest);
         return new CompetencyCategory(cat.category(), String.join(", ", ordered));
+    }
+
+    private List<String> splitSkills(String skills) {
+        return Arrays.stream(skills.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+    }
+
+    private boolean matchesAny(String skill, List<String> keywords) {
+        String lower = skill.toLowerCase();
+        String coreWord = lower.split("[ /]")[0];
+        return keywords.stream().anyMatch(kw -> containsWord(kw, lower) || containsWord(kw, coreWord));
+    }
+
+    // Whole-word match against the requirement text, so short skill names (e.g. "Go") don't
+    // trivially match themselves or false-positive against unrelated words like "google"/"ongoing".
+    private boolean containsWord(String text, String word) {
+        if (word.isEmpty()) return false;
+        return Pattern.compile("\\b" + Pattern.quote(word) + "\\b").matcher(text).find();
     }
 }

@@ -1,6 +1,5 @@
 package org.example.agent;
 
-import org.example.model.CompetencyCategory;
 import org.example.model.JobRequirement;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public class PromptTemplates {
             "no markdown fences, no explanation, no extra text.";
 
     public static final String SYSTEM_BULLET_MOD =
-            "You are a professional resume editor. Preserve sentence structure exactly. " +
+            "You are a professional resume editor. These are resume line for employer 1.select best 12 line that matches above job requirement. make lines more human like and make it simpler. Just output response in text " +
             "Return only the modified bullet text — no explanation, no quotes, no prefix.";
 
     public static final String SYSTEM_SUMMARY =
@@ -76,101 +75,56 @@ public class PromptTemplates {
                 """;
     }
 
-    public static String reorderAndFilterCompetencies(List<JobRequirement> requirements,
-                                                       List<CompetencyCategory> categories) {
+    // Shared, byte-identical text reused across every employer's bullet-scoring call within a
+    // run — a caller passes this as the `cacheablePrefix` to LlmClient.call(system,
+    // cacheablePrefix, rest) so Anthropic bills it once per cache window instead of once per call.
+    public static String requirementsBlock(List<JobRequirement> requirements) {
         String reqs = requirements.stream()
                 .map(r -> "- [" + r.priority() + "] " + r.description())
                 .collect(Collectors.joining("\n"));
-        String cats = categories.stream()
-                .map(c -> "{\"category\": \"" + c.category() + "\", \"skills\": \"" + c.skills() + "\"}")
-                .collect(Collectors.joining(",\n  ", "[\n  ", "\n]"));
-        return """
-                Reorder these resume skill categories and the skills within each category based on the job requirements.
-
-                WITHIN-CATEGORY SKILL ORDERING (most important rule):
-                - Skills explicitly named in HIGH priority requirements MUST come first in their category.
-                - Skills named in MED requirements come next.
-                - Remaining skills follow in any order.
-                - Example: JD says "requires Java" → Language category becomes "Java 8/11/14, Python, TypeScript, JavaScript"
-                  (Java moves to position 1, everything else stays after it)
-                - Example: JD says "requires Kubernetes and Kafka" → Platform & Infra becomes "Kubernetes, Kafka, Docker, ..."
-
-                CATEGORY ORDERING:
-                - Categories whose skills most directly match HIGH priority requirements come first.
-
-                HARD RULES:
-                - Do NOT add or remove any skill or category — every item in the input must appear in the output
-                - Preserve exact skill text (e.g. "Java 8/11/14" not just "Java")
-                - Return the same JSON format: array of {"category": "...", "skills": "..."}
-                  where "skills" is a comma-separated string in the new priority order
-
-                Job Requirements:
-                """ + reqs + """
-
-                Current Skill Categories:
-                """ + cats + """
-
-                Return ONLY the reordered JSON array.
-                """;
+        return "Job Requirements:\n" + reqs;
     }
 
-    public static String scoreBullets(String companyName, List<String> bullets,
-                                      List<JobRequirement> requirements) {
-        String reqs = requirements.stream()
-                .map(r -> "- [" + r.priority() + "] " + r.description())
-                .collect(Collectors.joining("\n"));
+    public static String scoreBullets(String companyName, List<String> bullets, int rewriteThreshold) {
         String indexedBullets = IntStream.range(0, bullets.size())
                 .mapToObj(i -> i + ": " + bullets.get(i))
                 .collect(Collectors.joining("\n"));
         return """
-                Score each resume bullet for relevance to the job requirements below.
-                Score 0-10 (10 = directly addresses a HIGH priority requirement).
-                Give score >= 6 to bullets that meaningfully cover any requirement.
 
-                Job Requirements:
-                """ + reqs + """
+                Score each resume bullet for relevance to the job requirements above,
+                and also rewrite bullets that clear the rewrite threshold below to be
+                more human-like and simpler, matching the wording of the job requirement
+                each one best addresses.
+
+                SCORING:
+                - Score 0-10 (10 = directly addresses a HIGH priority requirement).
+                - Give score >= 6 to bullets that meaningfully cover any requirement.
+
+                REWRITE RULES:
+                - Only include a "rewritten" field for bullets scoring >= """ + rewriteThreshold + """
+                . For bullets scoring below """ + rewriteThreshold + """
+                , omit the "rewritten" key entirely — do not rewrite bullets that won't be used.
+                - Make it read like a real engineer wrote it, not a language model
+                - Keep it simple and natural
+                - Do NOT add metrics, numbers, or claims not in the original bullet
+                - Do NOT remove or alter any existing metric, number, or percentage from the original bullet — keep every one exactly as written
+                - Do NOT change the meaning or scope
 
                 Employer: """ + companyName + """
 
                 Bullets:
                 """ + indexedBullets + """
 
-                Return ONLY a JSON array: [{"index": N, "score": N, "covers": ["requirement text"]}]
+                Return ONLY a JSON array: [{"index": N, "score": N, "covers": ["requirement text"], "rewritten": "simplified human-like version of the bullet (omit this key for low-scoring bullets)"}]
                 Include an entry for every bullet index from 0 to """ + (bullets.size() - 1) + ".";
-    }
-
-    public static String checkCoverage(List<JobRequirement> requirements, List<String> selectedBullets) {
-        String highReqs = requirements.stream()
-                .filter(r -> r.priority() == JobRequirement.Priority.HIGH)
-                .map(r -> "- " + r.description())
-                .collect(Collectors.joining("\n"));
-        if (highReqs.isEmpty()) highReqs = "(none — all requirements are MED or LOW)";
-
-        String bullets = IntStream.range(0, selectedBullets.size())
-                .mapToObj(i -> (i + 1) + ". " + selectedBullets.get(i))
-                .collect(Collectors.joining("\n"));
-
-        return """
-                Do these selected resume bullets adequately cover the HIGH priority job requirements?
-
-                HIGH Priority Requirements:
-                """ + highReqs + """
-
-                Selected Bullets:
-                """ + bullets + """
-
-                Return ONLY JSON: {"acceptable": true/false, "coverage_score": 0-10, "uncovered": ["requirement text"]}
-                "acceptable" is true when at least 70% of HIGH priority requirements are addressed.
-                """;
     }
 
     public static String modifyBullet(String uncoveredRequirement, String originalBullet) {
         return """
-                Minimally modify this resume bullet to better match the job requirement.
+                make lines more human like and make it simpler
                 STRICT RULES:
-                - Preserve the exact sentence structure
-                - Substitute at most 2 words with equivalent terms from the requirement
                 - Do NOT add metrics, numbers, or claims not in the original bullet
+                - Do NOT remove or alter any existing metric, number, or percentage from the original bullet — keep every one exactly as written
                 - Do NOT change the meaning or scope
 
                 Job Requirement: """ + uncoveredRequirement + """

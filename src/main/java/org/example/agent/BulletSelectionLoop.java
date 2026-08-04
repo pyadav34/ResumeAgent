@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
 
 public class BulletSelectionLoop {
 
-    private record BulletScore(int index, int score) {}
+    private record BulletScore(int index, int score, List<String> covers, String rewritten) {}
 
     private record CoverageResult(boolean acceptable, int coverageScore, List<String> uncovered) {}
+
+    public record BulletSelectionResult(TailoredEntry entry, Map<String, List<String>> coverage) {}
 
     private final LlmClient claude;
 
@@ -23,20 +25,38 @@ public class BulletSelectionLoop {
         this.claude = claude;
     }
 
-    public TailoredEntry select(EmploymentEntry entry, List<JobRequirement> requirements) {
+    public BulletSelectionResult select(EmploymentEntry entry, List<JobRequirement> requirements) {
         List<String> all = entry.bullets();
 
-        // Tiny employment entries: include everything
+        // Tiny employment entries: include everything, but still humanize/simplify each line
         if (all.size() <= 2) {
-            for (String b : all) log("  [KEEP  ] " + preview(b));
-            return tailored(entry, new ArrayList<>(all));
+            String fallbackRequirement = pickRequirementFor(List.of(), requirements);
+            List<String> finalBullets = new ArrayList<>();
+            Map<String, List<String>> coverage = new LinkedHashMap<>();
+            for (String b : all) {
+                String rewritten = modifyBullet(fallbackRequirement, b);
+                if (rewritten.isBlank()) rewritten = b;
+                finalBullets.add(rewritten);
+                coverage.put(rewritten, List.of());
+                log("  [KEEP  ] " + preview(rewritten));
+            }
+            return new BulletSelectionResult(tailored(entry, finalBullets), coverage);
         }
 
-        // LLM #3: score all bullets once
+        String firstBullet = all.get(0);
+
+        // LLM #3: score all bullets once — also returns which requirements each bullet covers
+        // and a humanized/simplified rewrite, so no separate LLM call is needed per bullet later.
         List<BulletScore> scores = scoreBullets(entry.companyName(), all, requirements);
         Map<String, Integer> scoreByText = new HashMap<>();
+        Map<String, List<String>> coversByText = new HashMap<>();
+        Map<String, String> rewrittenByText = new HashMap<>();
         for (BulletScore s : scores) {
-            if (s.index() < all.size()) scoreByText.put(all.get(s.index()), s.score());
+            if (s.index() < all.size()) {
+                scoreByText.put(all.get(s.index()), s.score());
+                coversByText.put(all.get(s.index()), s.covers());
+                rewrittenByText.put(all.get(s.index()), s.rewritten());
+            }
         }
 
         // Log scores for all bullets
@@ -45,7 +65,9 @@ public class BulletSelectionLoop {
             log("  [score=" + score + "] " + preview(all.get(i)));
         }
 
-        // Initial selection: threshold filtered, sorted by score desc, capped at MAX_BULLETS
+        // Initial selection: threshold filtered, sorted by score desc, capped at MAX_BULLETS.
+        // `selected` always holds ORIGINAL bullet text — final (possibly rewritten) text lives
+        // in `modifications`, so we never lose track of a bullet's original position/identity.
         List<String> selected = all.stream()
                 .filter(b -> scoreByText.getOrDefault(b, 0) >= AppConfig.SCORE_THRESHOLD)
                 .sorted(Comparator.comparingInt((String b) -> scoreByText.getOrDefault(b, 0)).reversed())
@@ -53,19 +75,32 @@ public class BulletSelectionLoop {
                 .collect(Collectors.toCollection(ArrayList::new));
 
         // Guarantee at least one bullet
-        if (selected.isEmpty() && !all.isEmpty()) {
+        if (selected.isEmpty()) {
             String best = all.stream()
                     .max(Comparator.comparingInt(b -> scoreByText.getOrDefault(b, 0)))
                     .orElse(all.get(0));
             selected.add(best);
         }
 
-        // Track LLM #5 modifications: original text → modified text
+        // Always keep the first bullet of each employer, even if it scored below threshold
+        if (!selected.contains(firstBullet)) {
+            if (selected.size() >= AppConfig.MAX_BULLETS) {
+                selected.stream()
+                        .min(Comparator.comparingInt(b -> scoreByText.getOrDefault(b, 0)))
+                        .ifPresent(selected::remove);
+            }
+            selected.add(firstBullet);
+            log("  [KEEP  ] (always-keep first line) " + preview(firstBullet));
+        }
+
+        // Track modifications: original text → rewritten text
         Map<String, String> modifications = new LinkedHashMap<>();
 
-        // LLM #4 + optional LLM #5 loop
+        // Coverage is computed locally from the "covers" data already returned by LLM #3 —
+        // no extra LLM call needed to ask essentially the same question again.
+        // LLM #4 (optional): minimally modify a bullet to close a coverage gap
         for (int iter = 0; iter < AppConfig.MAX_LOOP_ITER; iter++) {
-            CoverageResult cov = checkCoverage(requirements, selected);
+            CoverageResult cov = computeCoverage(requirements, selected, coversByText);
             log("  [coverage iter=" + (iter + 1) + "] score=" + cov.coverageScore()
                     + " acceptable=" + cov.acceptable()
                     + (cov.uncovered().isEmpty() ? "" : " uncovered: " + cov.uncovered().get(0)));
@@ -82,8 +117,9 @@ public class BulletSelectionLoop {
             if (selected.size() >= AppConfig.MAX_BULLETS) break;
 
             String candidate = unselected.get(0);
+            selected.add(candidate);
 
-            // LLM #5: minimally modify if there's an uncovered HIGH requirement
+            // Minimally modify if there's an uncovered HIGH requirement
             if (!cov.uncovered().isEmpty()) {
                 String req = cov.uncovered().get(0);
                 String modified = modifyBullet(req, candidate);
@@ -91,43 +127,63 @@ public class BulletSelectionLoop {
                     modifications.put(candidate, modified);
                     log("  [MODIFY ] " + preview(candidate));
                     log("         → " + preview(modified));
-                    selected.add(modified);
-                } else {
-                    selected.add(candidate);
+                    List<String> claims = new ArrayList<>(coversByText.getOrDefault(candidate, List.of()));
+                    claims.add(req);
+                    coversByText.put(candidate, claims);
                 }
-            } else {
-                selected.add(candidate);
             }
         }
 
-        // Preserve original resume order
-        List<String> ordered = all.stream()
-                .filter(b -> selected.stream().anyMatch(s -> s.equals(b) || textMatch(s, b)))
-                .toList();
-        // Append any LLM-modified bullets not in original order
-        for (String s : selected) {
-            if (!all.contains(s)) ordered = append(ordered, s);
+        // Apply the humanized/simplified rewrite already returned by LLM #3 to every selected
+        // bullet that wasn't already rewritten above to close a coverage gap. LLM #3 only rewrote
+        // bullets scoring at/above the threshold (to avoid paying for rewrites of bullets that get
+        // discarded) — a bullet can still be selected below that score via the always-keep-first-line
+        // rule, the guarantee-at-least-one fallback, or as a gap-fill candidate with no uncovered
+        // requirement, so those get a one-off rewrite call here instead of being left un-humanized.
+        for (String original : selected) {
+            if (modifications.containsKey(original)) continue;
+            String rewritten = rewrittenByText.getOrDefault(original, "");
+            if (rewritten.isBlank()) {
+                String requirement = pickRequirementFor(coversByText.getOrDefault(original, List.of()), requirements);
+                rewritten = modifyBullet(requirement, original);
+            }
+            if (!rewritten.isBlank() && !rewritten.equals(original)) {
+                modifications.put(original, rewritten);
+                log("  [SIMPLIFY] " + preview(original));
+                log("           → " + preview(rewritten));
+            }
         }
 
-        // Log final keep/skip decisions
-        Set<String> selectedSet = new HashSet<>(selected);
+        // Preserve original resume order using original bullet identity (no fuzzy text matching needed
+        // now that `selected` always holds original text regardless of any later rewrite)
+        List<String> orderedOriginals = all.stream().filter(selected::contains).toList();
+
+        List<String> finalBullets = new ArrayList<>();
+        Map<String, List<String>> finalCoverage = new LinkedHashMap<>();
         log("  --- final selection ---");
+        for (String original : orderedOriginals) {
+            String finalText = modifications.getOrDefault(original, original);
+            finalBullets.add(finalText);
+            finalCoverage.put(finalText, coversByText.getOrDefault(original, List.of()));
+            log(modifications.containsKey(original)
+                    ? "  [MODIFIED] " + preview(original)
+                    : "  [KEPT    ] " + preview(original));
+        }
         for (String b : all) {
-            boolean kept = selectedSet.contains(b)
-                    || ordered.stream().anyMatch(o -> textMatch(o, b));
-            if (kept) {
-                String modified = modifications.get(b);
-                if (modified != null) {
-                    log("  [MODIFIED] " + preview(b));
-                } else {
-                    log("  [KEPT    ] " + preview(b));
-                }
-            } else {
-                log("  [SKIPPED ] " + preview(b));
-            }
+            if (!selected.contains(b)) log("  [SKIPPED ] " + preview(b));
         }
 
-        return tailored(entry, ordered);
+        return new BulletSelectionResult(tailored(entry, finalBullets), finalCoverage);
+    }
+
+    private String pickRequirementFor(List<String> covers, List<JobRequirement> requirements) {
+        if (covers != null && !covers.isEmpty()) return covers.get(0);
+        return requirements.stream()
+                .filter(r -> r.priority() == JobRequirement.Priority.HIGH)
+                .map(JobRequirement::description)
+                .findFirst()
+                .or(() -> requirements.stream().map(JobRequirement::description).findFirst())
+                .orElse("General role alignment");
     }
 
     private void log(String msg) {
@@ -138,19 +194,6 @@ public class BulletSelectionLoop {
         return text.length() > 80 ? text.substring(0, 77) + "..." : text;
     }
 
-    private boolean textMatch(String a, String b) {
-        // Modified bullets may differ slightly; check if starts the same way
-        if (a.equals(b)) return true;
-        int minLen = Math.min(30, Math.min(a.length(), b.length()));
-        return minLen > 10 && a.substring(0, minLen).equalsIgnoreCase(b.substring(0, minLen));
-    }
-
-    private List<String> append(List<String> list, String item) {
-        List<String> result = new ArrayList<>(list);
-        result.add(item);
-        return result;
-    }
-
     private TailoredEntry tailored(EmploymentEntry e, List<String> bullets) {
         return new TailoredEntry(e.companyName(), e.title(), e.startDate(), e.endDate(), bullets, e.technologies());
     }
@@ -158,7 +201,8 @@ public class BulletSelectionLoop {
     private List<BulletScore> scoreBullets(String company, List<String> bullets,
                                             List<JobRequirement> requirements) {
         String raw = claude.call(PromptTemplates.SYSTEM_JSON,
-                                 PromptTemplates.scoreBullets(company, bullets, requirements));
+                                 PromptTemplates.requirementsBlock(requirements),
+                                 PromptTemplates.scoreBullets(company, bullets, AppConfig.SCORE_THRESHOLD));
         String json = JsonUtil.stripFences(raw);
         logLlm("LLM #3 score-bullets (" + company + ")", json);
         try {
@@ -172,7 +216,10 @@ public class BulletSelectionLoop {
                 if (m == null) continue;
                 int index = ((Number) m.getOrDefault("index", 0)).intValue();
                 int score = ((Number) m.getOrDefault("score", 0)).intValue();
-                result.add(new BulletScore(index, score));
+                List<String> covers = castStringList(m.getOrDefault("covers", List.of()));
+                Object rewrittenObj = m.get("rewritten");
+                String rewritten = rewrittenObj != null ? rewrittenObj.toString() : "";
+                result.add(new BulletScore(index, score, covers, rewritten));
             }
             return result;
         } catch (Exception e) {
@@ -182,33 +229,33 @@ public class BulletSelectionLoop {
         }
     }
 
-    private CoverageResult checkCoverage(List<JobRequirement> requirements, List<String> selected) {
-        String raw = claude.call(PromptTemplates.SYSTEM_JSON,
-                                 PromptTemplates.checkCoverage(requirements, selected));
-        String json = JsonUtil.stripFences(raw);
-        logLlm("LLM #4 coverage-check", json);
-        try {
-            Map<String, Object> m = JsonUtil.parse(json, new TypeReference<>() {});
-            if (m == null) {
-                System.err.println("[warn] coverage check returned null; assuming acceptable");
-                return new CoverageResult(true, 5, List.of());
+    private CoverageResult computeCoverage(List<JobRequirement> requirements, List<String> selected,
+                                            Map<String, List<String>> coversByText) {
+        List<String> highReqs = requirements.stream()
+                .filter(r -> r.priority() == JobRequirement.Priority.HIGH)
+                .map(JobRequirement::description)
+                .toList();
+        if (highReqs.isEmpty()) return new CoverageResult(true, 10, List.of());
+
+        Set<String> covered = new HashSet<>();
+        for (String bullet : selected) {
+            for (String claim : coversByText.getOrDefault(bullet, List.of())) {
+                for (String req : highReqs) {
+                    if (RequirementMatch.matches(claim, req)) covered.add(req);
+                }
             }
-            boolean acceptable     = Boolean.TRUE.equals(m.get("acceptable"));
-            int coverageScore      = ((Number) m.getOrDefault("coverage_score", 0)).intValue();
-            List<String> uncovered = castStringList(m.getOrDefault("uncovered", List.of()));
-            return new CoverageResult(acceptable, coverageScore, uncovered);
-        } catch (Exception e) {
-            System.err.println("[warn] coverage check parse error: " + e.getMessage());
-            System.err.println("       raw response: " + json);
-            return new CoverageResult(true, 5, List.of());
         }
+        List<String> uncovered = highReqs.stream().filter(r -> !covered.contains(r)).toList();
+        int coverageScore = Math.round(10f * covered.size() / highReqs.size());
+        boolean acceptable = covered.size() >= (int) Math.ceil(highReqs.size() * 0.7);
+        return new CoverageResult(acceptable, coverageScore, uncovered);
     }
 
     private String modifyBullet(String requirement, String bullet) {
         try {
             String result = claude.call(PromptTemplates.SYSTEM_BULLET_MOD,
                                         PromptTemplates.modifyBullet(requirement, bullet)).trim();
-            logLlm("LLM #5 modify-bullet", result);
+            logLlm("LLM modify-bullet", result);
             return result;
         } catch (Exception e) {
             System.err.println("[warn] bullet modification failed: " + e.getMessage());

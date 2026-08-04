@@ -1,5 +1,10 @@
 package org.example.config;
 
+import org.example.llm.ClaudeClient;
+import org.example.llm.GeminiClient;
+import org.example.llm.OllamaClient;
+import org.example.llm.OpenRouterClient;
+
 public class AppConfig {
 
     // ── Provider selection ───────────────────────────────────────────────────
@@ -8,8 +13,9 @@ public class AppConfig {
     public enum Provider { ANTHROPIC, OPENROUTER, GEMINI, OLLAMA, NVIDIA }
 
     public static final Provider PROVIDER = Provider.valueOf(
-            System.getProperty("llm.provider", "NVIDIA").toUpperCase()
+            System.getProperty("llm.provider", "ANTHROPIC").toUpperCase()
     );
+    //ANTHROPIC,OPENROUTER,GEMINI,OLLAMA,NVIDIA
 
     // ── Model IDs per provider ───────────────────────────────────────────────
     public static final String ANTHROPIC_MODEL  = "claude-sonnet-4-6";
@@ -38,13 +44,13 @@ public class AppConfig {
     // When true, skip the LLM tailoring pipeline entirely and render resume.txt as-is.
     // Override at runtime with -Dignore.llms=true
     public static final boolean IGNORE_LLMS = Boolean.parseBoolean(
-            System.getProperty("ignore.llms", "true")
+            System.getProperty("ignore.llms", "false")
     );
     public static final String JD_PATH         = "jd.txt";
     public static final String OUTPUT_BASE_DIR = System.getProperty("user.home") + "/clauderesume";
     public static final String RENDER_SCRIPT   = "render/render.js";
     public static final String STYLE           = "classic";
-    public static final int    MAX_BULLETS     = 10;
+    public static final int    MAX_BULLETS     = 13;
     public static final int    MAX_LOOP_ITER   = 3;
     public static final int    SCORE_THRESHOLD = 6;
 }

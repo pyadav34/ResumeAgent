@@ -5,32 +5,130 @@ purshotam.yadav@gmail.com
 Dallas, Texas 75048
 
 
+Professional Summary
+
+Principal Engineer with 20+ years building scalable, high-availability, low-latency application on Cloud (AWS, Azure).
+
+
 Fidelity investment |  Principal Engineer  |  Sep 2022 – Present
-Owned the architecture, development, and production operations of a real-time trade reporting system, cutting compliance risk and reporting delays.
-Scaled the platform to handle 50 million+ transactions a day while adding support for many more client accounts.
-Implemented Go based scalable microservice, supporting high-volume transactions with low latency and high availability.
-Designed a distributed locking mechanism using Redis so message processing stayed fault-tolerant across multi-region Kubernetes pods, hitting a strict 10-second SLA 100% of the time.
-Drove reliability improvements across multiple distributed, cloud-native services by shaping architecture and failure-isolation patterns used by other teams.
-Led the move to gRPC for internal service-to-service communication, replacing REST in key paths for lower latency and better throughput at scale.
-Built an event-driven pipeline on Apache Kafka that scaled the system to handle 3x more daily transactions.
-Built a Kafka Schema Registry automation platform for schema evolution and safe QA-to-Prod promotion, cutting release friction by about 50%.
-Tuned Postgres data models and queries to reliably support 5,000+ per second transactions during peak load.
-Built Terraform and CI/CD automation adopted by 8 teams, cutting service provisioning time from days to hours.
-Built an observability platform (metrics, logs, alerts) that cut mean time to detect issues from 18 minutes to 7.
-Managed large-scale Kubernetes (EKS) clusters using the Operator pattern, automating deployments and scaling and cutting manual ops work by ~60%.
-Acted as a technical resource across teams — code reviews, mentoring, and driving best practices across a large distributed systems footprint.
+
+Led end-to-end delivery of Trade Reporting and Compliance Engines (TRACE), owning architecture, development, production deployment, and operations, significantly reducing late trade reporting and compliance risk.
+Enhanced system scalability to support a greater number of MPIDs, efficiently processing daily trade volumes to 50 million.
+#REST
+Optimized REST API performance through asynchronous processing, caching, connection pooling, and database query tuning, significantly reducing response times.
+Design resilient, REST APIs with OpenAPI specifications, utilizing idempotency and clean versioning strategies to ensure zero-downtime service integration
+
+Microservice
+Built scalable microservice, supporting high-volume transactions with low latency and high availability.
+Optimized REST API performance through asynchronous processing, caching, connection pooling, and database query tuning, significantly reducing response times.
+
+# reliability
+Architected and implemented distributed lock mechanism enabling fault-tolerant FIX message processing across multi-region kubernetes pods, ensuring 100% adherence to 10-second regulatory reporting SLA.
+Drove systemic reliability improvements across distributed, cloud-native services by influencing architecture, failure isolation patterns, and operational standards across multiple teams and regions.
+
+#grpc
+Led adoption of gRPC for internal service communication, replacing REST in critical paths to achieve lower latency, efficient serialization (Protobuf), and improved throughput in high-scale microservices architecture.
+
+#kafka
+Engineered a Kafka Schema Registry automation platform supporting schema evolution, compatibility validation, and controlled QA→Prod promotion, alongside subject and security orchestration—cutting release friction by ~50%, reducing schema-related failures, and improving cross-team development velocity.
+Implemented a high-throughput, event-driven architecture using Apache Kafka, boosting system scalability to support a 3x increase in daily transactions/events.
+
+#terraform
+Built reusable infrastructure and deployment automation frameworks (Terraform, CI/CD) integrate with Jenkins adopted by 8 teams, reducing manual work, and enabling teams to safely provision and operate production services in hours instead of days.
+
+#observabilty
+Designed and rolled out a comprehensive observability platform (metrics, logs, alerts) to proactively detect reliability risks, reducing MTTD from 18 minutes to 7 minutes.
+Redesigned alerting strategy with SLO-based thresholds and alert correlation, reducing alert noise and enabling faster, more actionable incident response across distributed systems.
+
+
+#database
+Effectively build data model and performance tuning for Postgres to support 4k+ transaction during peak hours.
+
+#lambda
+Developed AWS Lambda functions to continuously monitor the health of Apache Kafka and Redis services, enabling automated failover and improving system availability.
+Reduced operational costs by right-sizing AWS Lambda concurrency and memory allocation while maintaining application SLAs.
+
+#step function
+
+#test
+Established automated testing patterns across microservices (unit, integration, contract, and end-to-end), improving release confidence and reducing production defects in high-scale distributed systems.
+Built a Generative AI solution using LLMs to automatically generate application test cases from business requirements and API specifications, reducing manual testing effort and improving test coverage.
+
+#kubernetes
+Implemented Kubernetes autoscaling and zero-downtime rollout strategies with robust liveness/readiness health checks, ensuring reliable production support.
+Designed and delivered 20+ containerized microservices, packaged as Docker images and deployed to Kubernetes with automated build and release pipelines.
+Configured ALB ingress controller to manage external traffic routing across 10+ microservices, enabling path-based routing and SSL termination at the edge.
+
+#GraphQL
+Solved the over-fetching and under-fetching challenges of REST APIs by introducing GraphQL, enabling clients to retrieve only the required data and reducing network payload by 60%.
+Built secure GraphQL APIs with JWT/OAuth2 authentication, field-level authorization, and query validation to prevent unauthorized data access and improve API security.
+
+
+#platform
+Eliminated certificate-related outages by automating end-to-end certificate lifecycle using Venafi and Kubernetes cert-manager, enabling secure Kafka service integrations, zero-downtime certificate rotation, and consistent secret management across distributed microservices.
+Built tool to securely manage and distribute digital secrets/certificate, ClientID, secrets enforcing standardized access controls and reducing operational risk across teams
+Engineered and managed large-scale Kubernetes (Amazon EKS) clusters using the Operator pattern, automating application lifecycle (deployments, scaling, failover, upgrades) and reducing manual operational effort by ~60% while improving system reliability and consistency across services.
+
+
+
+Mentored engineers on production readiness, incident response, resiliency patterns, observability standards, and scalable microservice design practices.
+#AI
+Introduced agentic AI into the trade reject workflow, building an LLM-driven agent that classifies and triages FINRA reject messages, recommends remediation.
+Led design decisions on LLM-driven vs. code-driven orchestration across agent workflows, choosing the right pattern based on task ambiguity, latency, and cost constraints.
+Drove adoption of AI coding assistants across teams, establishing usage patterns and review guardrails that improved developer throughput on high-scale services.
+Broke down complex engineering problems into clear specs and implementation plans that AI agents executed — e.g., decomposed the TRACE reporting pipeline into modular tasks (validation, enrichment, submission, reconciliation) that agents built and tested independently.
+Identified regulatory compliance workflows better suited to AI agents than deterministic systems, and led the design of agentic solutions across audit response, trade surveillance, root-cause analysis, and regulatory guidance interpretation for TRACE reporting.
+Reduced LLM token usage across agent workflows through context pruning, response caching, and prompt compression, lowering inference cost while preserving output quality.
+Selected LLMs per task across a multi-provider stack (Anthropic, OpenAI, open-source) — frontier models for regulatory interpretation, smaller models for structured extraction — cutting cost without sacrificing accuracy
+Designed reusable MCP servers exposing internal services, databases, and file systems, allowing AI agents to execute enterprise operations through standardized tool interfaces,
+Designed and implemented guardrails for LLM workflows, enforcing input validation, prompt safety, permission checks, and reliable tool execution.
+Developed a RAG-based AI workflow using LangChain, LangGraph, and VectorDB to index FINRA policy documents, enabling AI agents to deliver accurate, citation-backed compliance guidance while minimizing LLM hallucinations.
+Deployed and operated LLM-based workflow on Azure AI Foundry — provisioning model endpoints, configuring content safety, and setting up observability to detect issue in prod env.
+Implemented a layered threat model for LLM agents covering input validation, retrieval hygiene, least-privilege tool scoping, output sanitization, anomaly monitoring, and human review of high-consequence actions
+Implemented a defense-in-depth threat model for agent workflows: input validation, retrieval integrity, least-privilege tools, output sanitization, anomaly monitoring, and human review of critical actions
+Implemented LLM evaluation frameworks and fallback mechanisms (retries, model downgrade, deterministic paths) to ensure production reliability.
+
+#TooLs, MCP, Langchain/langraph/ guard rails, boservatillty, evaluation, fallback mechanism, Azure AI foundry deployment.
+
+Implemented MuleSoft-based integration layer connecting TRACE with mainframe replacing point-to-point integrations.
+
+# React
+Built the traceUI application from scratch with React, routing, and state management, focusing on clean architecture and a smooth user experience.
+Refactored React component hierarchies to eliminate prop drilling, making the codebase significantly cleaner and easier to maintain.
+
+# Security
+Integrated OAuth 2.0 and OpenID Connect OIDC across the traceUI frontend and REST APIs to handle robust user authentication, token validation, and secure session handling.
+Secured enterprise microservices with OAuth 2.0/OIDC authentication, JWT validation, and IAM access controls, safeguarding sensitive financial data.
 
 SirusXM | Senior Software Engineer | Mar 2022- Aug 2022
-Led the design and development of a connected vehicle platform used across multiple OEM (Honda, FCA), building scalable backend services that supported 8M+ vehicles and shaped the platform's overall architecture.
-Built an AWS S3 data lake with product and business teams for marketing analytics, which helped drive a 10% increase in trial-to-paid conversions.
-Cut AWS costs by $180K a year through smarter S3 storage tiering and optimizing pipeline compute, without affecting customer SLAs.
-Wrote Terraform modules that baked in architecture standards — naming, security defaults, scaling patterns — so every team provisioned infrastructure consistently by default.
-Built versioned Go based REST APIs with OpenAPI/Swagger to connect frontend, backend, and third-party systems while keeping backward compatibility.
-Designed and optimized DynamoDB data models based on application access patterns, improving query performance, scalability, and cost efficiency.
-Designed and built mutual TLS (mTLS) authentication between connected vehicles and the HiveMQ MQTT broker for secure, certificate-based device communication.
+
+Led design and development of a next-generation connected vehicle platform across multiple OEM programs (Honda, FCA), delivering modular, scalable back-end services to 8M+ vehicles and shaping platform architecture direction adopted by partner teams.
+#data
+Partnered with product and business stakeholders to build an AWS S3 data lake for marketing analytics, driving a 10% revenue uplift in trial-to-paid conversions.
+#AWS
+Cut annual AWS spend by $180K through tiered S3 lifecycle policies and data pipeline compute optimization, improving operational efficiency without impacting customer-facing SLAs.
+#terraform
+Authored Terraform modules encoding architecture standards — naming conventions, security defaults, scaling patterns — so teams inherited best practices by default and provisioned infrastructure consistently.
+#REST
+Developed versioned REST APIs with OpenAPI (Swagger), enabling seamless integration between frontend, backend, and third-party systems while maintaining backward compatibility.
+Implement JWT validation for REST API
+#mulesoft
+Used MuleSoft to orchestrate integration across multiple application components (web, third-party services), streamlining data exchange and reducing latency.
+#database
+Eliminated PostgreSQL performance bottlenecks at scale — profiling slow queries, restructuring execution plans over large datasets, and tuning connection pooling and DB parameters — driving response times to sub-second.
+#security
+Designed and implemented mutual TLS (mTLS) authentication between connected vehicles and the HiveMQ MQTT broker, enabling secure, certificate-based communication and trusted device authentication.
+# graphQL
+Consolidated fragmented service responses into a single GraphQL schema, eliminating 12+ redundant API round-trips for the client-side dashboard and reducing total page load time by 1.5 seconds.
+#platform
+Build a distributed testing system to simulate 50 million connected vehicles, proving our MQTT broker can handle peak traffic with under 50ms delays.
+#React
+Built a React-based admin UI enabling teams to manage application configurations through a centralized interface.
+# lambda
+Developed Node.js-based AWS Lambda functions to process and consume files uploaded to Amazon S3 buckets.
 
 Nike | Senior Software Engineer | Jan 2015 – Mar 2020
-Built the Nike+ Fuel Band leaderboard with microservice and Kafka + Spark with 500M transactions/day
+Built the Nike+ Fuel Band leaderboard with REST API and Kafka + Spark with 500M transactions/day
 Improved REST API reliability by implementing retry mechanisms, circuit breakers, rate limiting, and request validation for fault-tolerant service communication.
 Used Bloom filters data structure to cut storage usage by 50%.
 Improved service response times to sub-second latency through performance engineering using Datadog APM, trace analysis, and bottleneck remediation.
@@ -39,11 +137,13 @@ Optimized DynamoDB partition and sort key design to support high-throughput, low
 Designed and optimized DynamoDB data models based on application access patterns, improving query performance, scalability, and cost efficiency.
 
 
+
 Core Competencies
 
-Language:  Go,TypeScript,JavaScript, Java 8/11/21, Python
-Cloud:  AWS, EKS ,ECS, Aurora, Athena, S3, SQS,Lambda,EventBridge,RDS, Secrets Manger,VPC ,SNS, SQS, EC2, CloudWatch, Route53
+Language:   Python, NodeJS,Java 8/11/21,JavaScript, TypeScript
+Cloud:  AWS, Azure, GCP, EKS ,Lambda,EventBridge, RDS, Secrets Manger, Step Functions, VPC Networking, Subnets, SNS, SQS, , EC2, CloudWatch, Route53
 Architecture:  Event-Driven Architecture, Event Sourcing, API Design
 Database/Storage:  Postgres, Redis, MySQL, DynamoDB, MongoDB,Cassandra
 Platform & Infra:  Kubernetes, Docker, Datadog, Kafka, Spark, Terraform, CICD, Helm
-Frameworks:  React ,React Router, FastAPI, OAuth2, Spring, Opensearch
+Frameworks:  React ,NextJS, FastAPI, OAuth2, Spring,SQLAlchemy
+

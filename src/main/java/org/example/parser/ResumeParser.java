@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ResumeParser {
 
@@ -33,7 +35,9 @@ public class ResumeParser {
 
         String currentCompany = null, currentTitle = null, currentStart = null, currentEnd = null;
         String currentTechnologies = null;
-        List<String> currentBullets = new ArrayList<>();
+        // LinkedHashSet: dedupes exact-duplicate lines within an employer (e.g. the same
+        // accomplishment accidentally listed under two topic tags) while preserving order.
+        Set<String> currentBullets = new LinkedHashSet<>();
 
         // Whether "Core Competencies" was declared after at least one employer has already
         // been seen — output should mirror that position (start vs. end of the resume).
@@ -74,7 +78,7 @@ public class ResumeParser {
                 currentTitle   = parts[1];
                 currentStart   = parts[2];
                 currentEnd     = parts[3];
-                currentBullets = new ArrayList<>();
+                currentBullets = new LinkedHashSet<>();
                 currentTechnologies = null;
                 section = Section.EMPLOYER;
                 continue;
@@ -97,6 +101,9 @@ public class ResumeParser {
                 case EMPLOYER -> {
                     if (isTechStackLine(trimmed)) {
                         currentTechnologies = trimmed.split(":\\s*", 2)[1].trim();
+                    } else if (trimmed.startsWith("#")) {
+                        // Topic tag grouping the bullets below it (e.g. "#kafka") — not an actual
+                        // resume bullet, so it shouldn't be scored/selected/rendered as one.
                     } else if (!trimmed.isEmpty()) {
                         currentBullets.add(trimmed);
                     }
