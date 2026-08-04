@@ -1,105 +1,65 @@
-Hertz
-
-We are seeking a Staff Full Stack Developer to design, build, and scale critical systems that power core business operations. This role requires strong expertise across both frontend and backend development, with the ability to design end-to-end solutions, drive architecture decisions, and deliver highly scalable, resilient systems.
-
-You will work across the full technology stack, partnering with product, design, and engineering teams to build modern, customer-centric experiences and robust backend platforms.
-
-A Day in the Life:
-1
-As a Staff Full Stack Developer, you will:
-
-Design and develop end-to-end features across frontend, backend, and APIs
-Own critical components of core systems
-Build scalable microservices and responsive user interfaces
-Collaborate with cross-functional teams to translate business requirements into technical solutions
-Lead architectural discussions and influence system design decisions
-Mentor junior engineers and promote engineering best practices
-Ensure high standards of performance, security, scalability, and maintainability
+Nicholas and Company
 
 
-What You will Do:
+https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=958067c6-26d0-41f1-8d53-18b1e4c9dc0c&ccId=19000101_000002&jobId=588697&lang=en_US
 
-Full Stack Development
+Sr. Cloud Integration Architect
+Regular Full Time
+Entry Level
+Salt Lake City, UT, US
+Today
+Requisition ID: 1555
 
-Design, develop, and maintain full stack applications (frontend + backend)
-Build modern UI applications using React, TypeScript, HTML, and CSS
-Develop backend services using Java, Node.js, or similar technologies
-Design and implement RESTful and/or GraphQL APIs
-System Design & Architecture
+Apply
+Salary Range:
+$140,000.00 To $195,000.00 Annually
+Sr. Cloud Integration Architect
 
-Architect scalable, distributed systems
-Design domain-driven solutions
-Ensure systems are resilient, fault-tolerant, and highly available
-Cloud & DevOps
+Were hiring a hands-on Integration Architect to design, build, and operate enterprise-grade APIs and integrations on AWS. This role supports both AWS serverless and server-based/container API implementations, including Lambda/API Gateway/Step Functions and EKS/ECS-hosted Node.js/Python Services. You will also lead iPaaS is acceptable. You must be ready to learn Boomi quickly and lead Boomi integration delivery after joining.
 
-Build and deploy applications in cloud environments (AWS, Azure, or GCP)
-Implement CI/CD pipelines and infrastructure-as-code practices
-Monitor and optimize system performance and reliability
-Data & Integration
+Apply at: http://www.nicholasandco.com/join-our-team
 
-Work with relational and NoSQL databases
-Design efficient data models and ensure data consistency
-Integrate with internal and external services (payments, identity, third-party APIs)
-Quality & Engineering Excellence
+Schedule: Remote: Monday- Friday 8:00 AM-5:00 PM. This is a salaried role schedule may change due to business demands.
 
-Drive test automation (unit, integration, end-to-end)
-Participate in code reviews and enforce coding standards
-Improve engineering processes, tooling, and developer productivity
-Collaboration & Leadership
+Pay: $140,000-$195,000 based on experience
 
-Partner with Product, UX, and business stakeholders
-Break down complex problems into deliverable solutions
-Mentor engineers and contribute to team growth
+Responsibilities:
 
+Architect and deliver enterprise integration solutions across SaaS, on-perm, and cloud systems using AWS-native patterns and an iPaaS platform (Boomi is our strategic platform).
+Design and implement REST APIs and integration services using a mix of:
 
-What We're Looking For:
+Serverless: API Gateway + Lambda, Step Functions for orchestration.
+Container/server-based: Node.js/Python APIs running on EKS and/or ECS.
+Build and operate containerized services:
 
-5+ years of full stack development experience
-Proven experience building and scaling production-grade systems
-Experience in domain-heavy systems (e.g., rental, travel, e-commerce, logistics) preferred
+Create/maintain Docker images and deployment manifests.
+Support ingress/routing and service-to-service communication.
+Implement scalability, health checks, rollouts, and reliability patterns.
+Lead iPaas integration delivery (platform-agnostic initially): process design, mapping/transforms, connector usage, error handling, retries, and operational support.
+Ramp up on Boomi and become the technical lead for Boomi integrations: establish patterns, governance, and reusable components.
+Define and enforce integration standards: API design guidelines, versioning, documentation (OpenAPI), canonical models (when applicable), and integration SLAs/SLOs.
+Implement security best practices for APIs and integrations (OAuth2/OIDC,JWT, IAM, secrets management, encryption).
+Drive observability and operational readiness: logs/metrics/tracing, dashboards, alerts, runbooks, and incident response support.
+Establish/strengthen/CI/CD and IaC for serverless and container-based workloads and improve developer enablement with templates and shared libraries.
+Mentor engineers, lead design/code reviews, and act as a technical authority for enterprise integration.
+Requirements:
 
+At least 7 years of experience in software engineering with strong experience in enterprise integration and distributed systems.
+Previous experience building secure systems and integrations: IAM, OAuth2/OIDC, JWT, secrets management.
+Previous iPaaS experience in any major platform (e.g. MuleSoft, informatica, Workato, SnapLogic, Azure Integration Services, TIBCO, Jitterbit, etc.).
+Previous experience with Kubernetes and/or ECS operational fundamentals:
+Deployments/services/ingress (Kubernetes) or task definitions/services (ECS).
+Scaling, rollout strategies, health checks, and production support.
+Previous experience building and supporting AWS-based APIs across both paradigms:
+Serverless: Lambda, API Gateway, Step Functions (as needed)
+Containers: EKS and/or ECS (Fargate or EC2), Docker
+Strong development skills in Node.js and Python (preferred/optional depending on team needs).
+Ability to learn new platforms quickly and lead delivery after ramp-up (Boomi).
+Strong API and integration design skills: OpenAPI/contract thinking, versioning, idempotency, resiliency, and backward compatibility.
+Preferred:
 
-Technical Skills
-
-Frontend
-
-Strong expertise in React, TypeScript, JavaScript, HTML, CSS
-Experience with modern frontend architectures and state management
-Focus on performance, accessibility, and responsive design
-Backend
-
-Proficiency in Java, Spring Boot, Node.js, or similar
-Strong experience designing APIs and microservices
-Understanding of authentication, authorization, and security best practices
-Cloud & Data
-
-Experience with AWS/Azure/GCP
-Strong knowledge of databases (PostgreSQL, MySQL, DynamoDB, etc.)
-Experience with caching, messaging systems (Kafka, SQS), and event-driven architecture
-Engineering Practices
-
-Strong understanding of system design, scalability, and distributed systems
-Experience with CI/CD, DevOps practices, and observability tools
-Test-driven development and automation mindset
-Key Competencies
-
-Strong problem-solving and analytical thinking
-Ability to own features end-to-end
-Excellent communication and collaboration skills
-Product mindset with focus on customer experience
-Adaptability in fast-paced environments
-
-
-We expect the starting salary to be around $175k but will be commensurate with experience.
-
-What You’ll Get:
-
-40% off any standard Hertz Rental  
-Paid Time Off
-Medical, Dental & Vision plan options
-Retirement programs, including 401(k) employer matching
-Paid Parental Leave & Adoption Assistance
-Employee Assistance Program for employees & family
-Educational Reimbursement & Discounts
-Voluntary Insurance Programs - Pet, Legal/Identity Theft, Critical Illness
-Perks & Discounts –Theme Park Tickets, Gym Discounts & more
+Prior Boomi AtomSphere experience
+Previous experience with API gateway patterns and Kubernetes add-ons (ALB ingress controller/NGINX, service mesh).
+Event-driven architecture and messaging (SNS/SQS, EventBridge, Kafka).
+Observaility tooling: CloudWatch, X-Ray, OpenTelemetry, Newrelic, Splunk, IaC+CI/CD: Terraform/CloudFormation/CDK; GitHub Actions/Jenkins/ArgoCD.
+Full-stack background (frontend+bnackend) and strong product/application engineering instincts.
