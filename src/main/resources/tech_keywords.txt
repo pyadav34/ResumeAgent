@@ -1,0 +1,220 @@
+# Tech keyword dictionary — one term per line, matched case-insensitively with word
+# boundaries against JD text. Lines starting with # and blank lines are ignored.
+# Grow this list over time; KeywordExtractor's LLM fallback catches anything missing here.
+
+# Cloud platforms & services
+AWS
+Amazon Web Services
+Azure
+Microsoft Azure
+GCP
+Google Cloud
+Lambda
+API Gateway
+Step Functions
+EKS
+ECS
+Fargate
+S3
+EC2
+RDS
+DynamoDB
+CloudFormation
+CloudFront
+SNS
+SQS
+IAM
+VPC
+Route 53
+Kinesis
+Redshift
+Elastic Beanstalk
+Azure Functions
+Azure DevOps
+AKS
+Azure Kubernetes Service
+GKE
+Google Kubernetes Engine
+BigQuery
+Cloud Functions
+Cloud Run
+Firebase
+Heroku
+DigitalOcean
+OpenShift
+
+# Languages
+Java
+Python
+JavaScript
+TypeScript
+Go
+Golang
+C++
+C#
+Ruby
+PHP
+Scala
+Kotlin
+Swift
+Rust
+Node.js
+Bash
+Shell
+SQL
+PL/SQL
+HTML
+CSS
+
+# Frameworks & libraries
+Spring
+Spring Boot
+Django
+Flask
+FastAPI
+Express
+React
+Angular
+Vue
+Next.js
+.NET
+ASP.NET
+Hibernate
+JPA
+gRPC
+GraphQL
+REST
+SOAP
+Struts
+
+# Data stores & messaging
+Kafka
+Apache Kafka
+RabbitMQ
+ActiveMQ
+Redis
+Memcached
+Elasticsearch
+Postgres
+PostgreSQL
+MySQL
+MongoDB
+Cassandra
+Oracle
+SQL Server
+Snowflake
+Hadoop
+Spark
+Apache Spark
+Airflow
+ETL
+
+# DevOps & infrastructure
+Docker
+Kubernetes
+K8s
+Terraform
+Ansible
+Puppet
+Chef
+Jenkins
+CI/CD
+GitLab
+GitHub Actions
+CircleCI
+Helm
+Istio
+Prometheus
+Grafana
+Datadog
+Splunk
+New Relic
+ELK
+Nagios
+ArgoCD
+Vault
+Consul
+
+# Integration / iPaaS
+Boomi
+MuleSoft
+Apache Camel
+Talend
+Informatica
+Workato
+Zapier
+SnapLogic
+IBM App Connect
+Tibco
+WSO2
+OpenAPI
+Swagger
+iPaaS
+EDI
+SFTP
+
+# Architecture & practices
+Microservices
+Serverless
+Event-driven
+Domain-Driven Design
+DDD
+TDD
+BDD
+Agile
+Scrum
+Kanban
+SAFe
+DevSecOps
+SRE
+Observability
+OAuth
+OAuth2
+SSO
+SAML
+JWT
+mTLS
+PKI
+
+# Testing
+JUnit
+Mockito
+Selenium
+Cypress
+Postman
+JMeter
+Cucumber
+
+# Certifications
+AWS Certified
+Azure Certified
+PMP
+CKA
+CKAD
+CISSP
+CSM
+
+# Other tooling
+Git
+GitHub
+Bitbucket
+Jira
+Confluence
+Maven
+Gradle
+npm
+Docker Compose
+Nginx
+Linux
+Unix
+
+# AI / ML
+Machine Learning
+Deep Learning
+LLM
+Generative AI
+TensorFlow
+PyTorch
+NLP
+OpenAI
+LangChain

@@ -8,7 +8,7 @@ public class AppConfig {
     public enum Provider { ANTHROPIC, OPENROUTER, GEMINI, OLLAMA, NVIDIA }
 
     public static final Provider PROVIDER = Provider.valueOf(
-            System.getProperty("llm.provider", "NVIDIA").toUpperCase()
+            System.getProperty("llm.provider", "ANTHROPIC").toUpperCase()
     );
 
     // ── Model IDs per provider ───────────────────────────────────────────────
@@ -39,7 +39,7 @@ public class AppConfig {
     public static final String OUTPUT_BASE_DIR = System.getProperty("user.home") + "/clauderesume";
     public static final String RENDER_SCRIPT   = "render/render.js";
     public static final String STYLE           = "classic";
-    public static final int    MAX_BULLETS     = 10;
+    public static final int    MAX_BULLETS     = 15;
     public static final int    MAX_LOOP_ITER   = 3;
     public static final int    SCORE_THRESHOLD = 6;
 }

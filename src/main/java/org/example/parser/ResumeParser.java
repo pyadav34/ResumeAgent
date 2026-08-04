@@ -75,7 +75,8 @@ public class ResumeParser {
                         currentStart   = parts[2];
                         currentEnd     = parts[3];
                         currentBullets = new ArrayList<>();
-                    } else if (!trimmed.isEmpty()) {
+                    } else if (!trimmed.isEmpty() && !trimmed.startsWith("#")
+                            && !currentBullets.contains(trimmed)) {
                         currentBullets.add(trimmed);
                     }
                 }
@@ -90,6 +91,13 @@ public class ResumeParser {
 
         Contact contact = parseContact(contactLines);
         String summary = summaryBuilder.toString().trim();
+
+        if (employments.isEmpty()) {
+            throw new IllegalStateException(
+                    "No employment entries parsed from resume.txt. The parser reads sections strictly in " +
+                    "order: Contact -> Professional Summary -> Core Competencies -> Employers. Check that " +
+                    "'Core Competencies' appears BEFORE the first employer entry, not after.");
+        }
 
         return new Resume(contact, summary, List.copyOf(competencies), List.copyOf(employments));
     }

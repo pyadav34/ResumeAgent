@@ -48,6 +48,36 @@ public class PromptTemplates {
                 """;
     }
 
+    public static String classifyKeywords(String jdText, List<String> dictionaryHits) {
+        String hitsList = dictionaryHits.isEmpty()
+                ? "(none found)"
+                : dictionaryHits.stream().map(t -> "- " + t).collect(Collectors.joining("\n"));
+        return """
+                A dictionary scan already found these exact terms in the job description below:
+                """ + hitsList + """
+
+
+                TASK 1 — Assign a priority to each term listed above, based on how the JD describes it:
+                  "HIGH": required / core / must-have
+                  "MED": preferred, or mentioned as general experience
+                  "LOW": nice-to-have / bonus
+
+                TASK 2 — Find any OTHER named technology, tool, platform, language, framework, or
+                certification mentioned by name in the JD that is NOT already in the list above
+                (the dictionary scan can miss less common product names). Assign each one a priority too.
+
+                STRICT RULES:
+                - Do not invent or infer a term that isn't explicitly named in the JD text
+                - Every term from the dictionary list above MUST appear in your output exactly once
+                - For task 1 items, reuse the exact term text as given above
+
+                Job Description:
+                """ + jdText + """
+
+                Return ONLY a JSON array: [{"term": "...", "priority": "HIGH|MED|LOW"}]
+                """;
+    }
+
     public static String tailorSummary(String originalSummary, List<JobRequirement> requirements) {
         String highReqs = requirements.stream()
                 .filter(r -> r.priority() == JobRequirement.Priority.HIGH)

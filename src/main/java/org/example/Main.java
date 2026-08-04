@@ -1,6 +1,8 @@
 package org.example;
 
+import org.example.agent.KeywordCoverageReport;
 import org.example.agent.ResumeAgent;
+import org.example.agent.TailorResult;
 import org.example.config.AppConfig;
 import org.example.model.Resume;
 import org.example.model.TailoredResume;
@@ -57,7 +59,8 @@ public class Main {
 
         // Run LLM pipeline
         ResumeAgent agent = new ResumeAgent();
-        TailoredResume tailored = agent.tailor(resume, jdText);
+        TailorResult result = agent.tailor(resume, jdText);
+        TailoredResume tailored = result.resume();
 
         // Write .docx
         StateSerializer serializer = new StateSerializer();
@@ -66,8 +69,13 @@ public class Main {
         // Convert to .pdf
         PdfConverter.convert(docxPath, pdfPath);
 
+        // Write keyword coverage report (score + missing skills)
+        Path reportPath = outputDir.resolve("coverage_report.txt");
+        Files.writeString(reportPath, KeywordCoverageReport.render(result.keywordCoverage()));
+
         System.out.println("=== Done ===");
-        System.out.println("DOCX: " + docxPath);
-        System.out.println("PDF : " + pdfPath);
+        System.out.println("DOCX  : " + docxPath);
+        System.out.println("PDF   : " + pdfPath);
+        System.out.println("Report: " + reportPath);
     }
 }

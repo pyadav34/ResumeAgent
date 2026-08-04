@@ -1,0 +1,70 @@
+
+Purshotam Yadav
+purshotam.yadav@gmail.com
+720-620-8940
+Dallas, Texas 75048
+
+
+Professional Summary
+
+Engineering leader with 20+ years leading high-performing teams and taking highly scalable, mission-critical applications from design to production.
+Hands-on with distributed systems and micro-services architecture, and with moving data and services off legacy infrastructure onto AWS.
+Works directly with product and business partners to scope what gets built, then ships it.
+Currently focused on where AI and agentic tooling actually fit in production systems.
+
+
+Fidelity investment |  Senior Manager/Principal Engineer  |  Sep 2022 – Present
+
+Led back-end engineering teams delivering the Regulatory Reporting platform end to end — technical vision, architecture, delivery, deployment, and 24×7 operations — significantly reducing late trade reporting and compliance risk.
+Owned the scaling roadmap to 50M daily trades across a growing set of MPIDs, and guided the multi-region fault-tolerance design (distributed locking for FIX processing) that holds 100% adherence to the 10-second regulatory reporting SLA.
+Set event-driven architecture direction on Apache Kafka, scaling to a 3x increase in daily events, and sponsored a Schema Registry automation platform (schema evolution, compatibility validation, governed QA→Prod promotion) that cut release friction ~50% and lifted cross-team velocity.
+Directed engineering of large-scale Amazon kubernetes platforms using the Operator pattern — automating deployment, scaling, failover, and upgrades — cutting manual operational effort ~60% and standardizing reliability practices across services.
+Established reusable infrastructure-as-code and CI/CD frameworks (Terraform, Jenkins) adopted by 8 engineering teams, taking production provisioning from days to hours.
+Defined and rolled out an observability and SLO-based alerting strategy across the portfolio, reducing MTTD from 18 minutes to 7 minutes while cutting alert noise and improving on-call health.
+Drove the org-wide adoption of gRPC/Protobuf over REST on critical paths — leading the evaluation and aligning peer teams on tradeoffs — lowering latency and improving throughput across high-scale microservices.
+Raised engineering quality and security standards across distributed teams: automated testing patterns (unit, integration, contract, E2E) and full certificate lifecycle automation (Venafi, cert-manager), eliminating certificate-related outages and reducing production defects.
+Introduced agentic AI into the trade reject workflow, building an LLM-driven agent that classifies and triages FINRA reject messages, recommends remediation
+Drove adoption of AI coding assistants across engineering teams, establishing usage patterns and review guardrails that improved developer throughput on high-scale services.
+Mentor senior engineers on system design, operational ownership, and technical decision-making; established architecture review and engineering standards that raised delivery quality across teams.
+
+SirusXM | Senior Software Engineer | Mar 2022- Aug 2022
+
+Led design and development of a next-generation connected vehicle platform supporting multiple OEM programs (Honda, FCA), delivering scalable, modular services for 8M+ vehicles and driving platform evolution across teams
+Reduced annual AWS overhead by $180K by engineering tiered S3 lifecycle policies and optimizing data pipeline compute efficiency.
+Designed and delivered 20+ containerized REST API microservices, packaged as Docker images and deployed to Kubernetes with automated build and release pipelines.
+Drove PostgreSQL query performance from sluggish to sub-second — profiling slow queries, restructuring execution plans for large datasets, tuning connection pooling and DB parameters to eliminate bottlenecks.
+Built Terraform modules that encode our architecture standards—naming conventions, security defaults, scaling patterns—so teams get best practices by default.
+Built AWS S3 data lake for marketing analytics that drove 10% revenue uplift from trial-to-paid conversions
+
+Nike | Senior Software Engineer | Jan 2015 – Mar 2020
+Built the Nike+ Fuel Band leaderboard with REST API and Kafka + PySpark with 500M transactions/day
+Used Bloom filters data structure to cut storage usage by 50%.
+Improved service response times to sub-second latency through performance engineering using Datadog APM, trace analysis, and bottleneck remediation.
+Improved resilience 30% with circuit breaker patterns to prevent cascading failures.
+Implemented Terraform and Helm to treat our entire Kubernetes setup like code—clean, predictable, and easily scaled to 10+ nodes.
+Deployed Datadog APM and tracing across 10+ microservices, streamlining root-cause analysis and significantly improving response times for production outages.
+
+
+Nagarro | Technical Lead | Jan 2013 – Dec 2014
+Led team to implement MyZenKey Identity provider, built on Auth2/ OpenID connect, used for apps and web application to authentication and authorization
+
+
+Interglobe Technologies  | Software engineer | May 2009 – Oct 2012
+Designed and implemented corporate travel booking tool used object pool, caching, database partition, reduced loading time from 5s to 1.5s
+Built asynchronous APIs for airline ticket comparison, reducing response wait times and improving fare aggregation across providers.
+
+HSBC/TCS | Software Engineer| Oct 2004 – May 2009
+
+Contributed to HSBC’s online banking platform, designing, and implementing core Account Management modules in a high-availability, security-critical environment
+Consistent focus on performance — tracked down Java JVM GC issues, memory leaks, connection pool bottlenecks. Refactored legacy codebases for maintainability
+
+
+Core Competencies
+
+Language:  Java 8/11/21, Python, JavaScript, TypeScript
+Cloud:  AWS, EKS ,Lambda,EventBridge, RDS, Secrets Manger, Step Functions, VPC Networking, Subnets, SNS, SQS, , EC2, CloudWatch, Route53
+Architecture:  Event-Driven Architecture, Event Sourcing, API Design
+Database/Storage:  Postgres, MySQL, DynamoDB, MongoDB,Cassandra
+Platform & Infra:  Kubernetes, Docker, Datadog, Kafka, Spark, Terraform, CICD, Helm
+Frameworks:  React ,FastAPI, OAuth2, Spring
+
